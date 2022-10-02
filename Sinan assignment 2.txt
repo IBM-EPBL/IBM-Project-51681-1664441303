@@ -1,0 +1,10 @@
+import random
+while(True or False):
+    temp=random.randint(10,99)
+    hum=random.randint(10,99)
+
+    if(temp>40):
+       print("ALARAM ON:  High temprature.....")
+    elif(hum>70):
+        print("ALARAM ON: HIGH humidity.......")
+        break
