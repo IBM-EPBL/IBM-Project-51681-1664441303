@@ -1,0 +1,41 @@
+<html lang="en">
+<head>
+ <meta charset="utf-8">
+ <title>FRED-powered chat app</title>
+ <script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
+ <script src="http:///code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+</head>
+<body>
+ <div id="messages"></div>
+ <!-- Important to configure onsubmit to false to prevent page refresh when pressing the return key -->
+ <form id="form" onsubmit="return false;">
+ <input id="text" type="text" onkeypress="return sendText(event)" />
+ </form>
+ <script type="text/javascript">
+
+ // Open a websocket using FRED.
+ var publishSocket = new WebSocket("wss://{yourusername}.fred.sensetecnic.com/api/public/messagereceive"); //server receives
+ var listenSocket = new WebSocket("wss://{yourusername}.fred.sensetecnic.com/api/public/messagepublish"); //server publishes
+
+ listenSocket.onmessage = function (event) {
+ // When receiving a message append a div child to #messages
+ data = JSON.parse(event.data);
+ $("#messages").append("<div class='msg sentiment"+data.sentiment+"' >"+data.timestamp+" - "+data.msg+"</div>")
+ if ($("#messages").children().length > 10 ) { $("#messages :first-child").remove();}
+ }
+
+ function sendText(event) {
+ if (event.keyCode == 13) { // Only if return key pressed
+ // Construct object containing the data the server needs.
+ d = new Date();
+ var data = {
+ msg: $("#text").val(),
+ timestamp: d.getHours() +":"+ d.getMinutes() + ":" + d.getSeconds()
+ };
+ publishSocket.send(JSON.stringify(data)); // Send the msg object as a JSON-formatted string.
+ $("#text").val(""); // Blank the text input element
+ }
+ }
+ </script>
+</body>
+</html>
